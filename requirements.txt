@@ -1,0 +1,10 @@
+conda create -n dbms
+cona activate dbms
+
+# Install the required packages
+
+pip install flask
+pip install Flask-SQLAlchemy
+pip install Flask-WTF
+
+Downlaod xampp
