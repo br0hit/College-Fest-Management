@@ -6,5 +6,8 @@ cona activate dbms
 pip install flask
 pip install Flask-SQLAlchemy
 pip install Flask-WTF
+pip install mysqlclient
+pip install flask-bcrypt
+pip install flask-login
 
 Downlaod xampp
