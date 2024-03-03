@@ -106,7 +106,7 @@ class participant(db.Model):
 # event must have only 1 organizer 
 # event may have many participants
 class events(db.Model):
-    _tablename_ = 'events'
+    _tablename_ = 'events' 
     event_id = db.Column(db.Integer, primary_key=True)
     event_name = db.Column(db.String(100), nullable=False)
     event_date = db.Column(db.String(100), nullable=False)

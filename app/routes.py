@@ -8,6 +8,12 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 import hashlib
 from functools import wraps
 
+from models import db
+from models import Admin, student, volunteer, organizer, participant, events
+from models import User
+
+from forms import CreateEventForm, EventForm, LoginForm
+
 # Create a hash
 def create_hash(data):
     hasher = hashlib.sha256()  # You can choose a different algorithm if needed
@@ -17,12 +23,6 @@ def create_hash(data):
 # Check a hash
 def check_hash(data, expected_hash):
     return create_hash(data) == expected_hash
-
-from models import db
-from models import Admin, student, volunteer, organizer, participant, events
-from models import User
-
-from forms import RegistrationForm
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -77,10 +77,13 @@ def login_participant():
 
 @app.route('/login/student', methods=['GET', 'POST'])
 def login_student():
-    if request.method == 'POST':
-        # Handle participant login form submission
-        email = request.form['email']
-        password = request.form['password']
+    
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        
+        email = form.email.data
+        password = form.password.data
         
         user = student.query.filter_by(email=email).first()
         print(user)
@@ -100,7 +103,56 @@ def login_student():
             flash('Login unsuccessful. Please check your username and password.', 'danger')
             return redirect(url_for('none'))
         
-    return render_template('student_login.html')
+    return render_template('student_login.html', form=form)
+
+# @app.route('/login/student', methods=['GET', 'POST'])
+# def login_student():
+#     form = LoginForm()
+#     if form.validate_on_submit():
+#         email = form.email.data
+#         password = form.password.data
+        
+#         # Dummy authentication, replace with your actual logic
+#         user = student.query.filter_by(email=email).first()
+#         if user and user.check_password(password):
+#             # Set the user_id and role in the session upon successful login
+#             session['user_id'] = user.id
+#             session['role'] = 'student'
+#             flash('Login successful!', 'success')
+#             return redirect(url_for('home')) # Assuming 'home' is the name of your homepage route
+#         else:
+#             flash('Login unsuccessful. Please check your email and password.', 'danger')
+#     return render_template('student_login.html', form=form)
+
+
+
+@app.route('/login/organiser', methods=['GET', 'POST'])
+def login_organiser():
+    if request.method == 'POST':
+        # Handle participant login form submission
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = organizer.query.filter_by(email=email).first()
+        print(user)
+        print(user.password)
+        print(create_hash(password))
+        
+        if check_hash(password, user.password):
+            # Redirect to afterlogin page upon successful login
+            
+            # Set the user_id and role in the session upon successful login
+            session['user_id'] = user.id
+            session['role'] = 'organizer'
+            
+            print(session)
+            return redirect(url_for('homepageo'))
+        else:
+            flash('Login unsuccessful. Please check your username and password.', 'danger')
+            return redirect(url_for('none'))
+        
+    return render_template('organiser_login.html')
+
 
 @app.route('/create_participant', methods=['GET', 'POST'])
 def create_participant():
@@ -147,14 +199,6 @@ def create_student():
             
         # Encrypt the password before storing it in the database
         hashed_password = create_hash(password)
-        
-        # participant details should be taken from the participant form
-        # if allocate bool is true, then random room number should be allocated
-    
-        # generate random room number if allocate is true
-        # if allocate is false, then room number should be taken from the participant form
-        
-
         user = student(name=name, email=email, password=hashed_password)
 
         db.session.add(user)
@@ -177,14 +221,6 @@ def create_organiser():
             
         # Encrypt the password before storing it in the database
         hashed_password = create_hash(password)
-        
-        # participant details should be taken from the participant form
-        # if allocate bool is true, then random room number should be allocated
-    
-        # generate random room number if allocate is true
-        # if allocate is false, then room number should be taken from the participant form
-        
-
         user = organizer(name=name, email=email, password=hashed_password, contact=contact)
 
         db.session.add(user)
@@ -365,12 +401,91 @@ def student_events():
     # Print the events in which the participant is there 
     return render_template('student_events.html', events=volunteer_val.events)
 
-# # Define the route for viewing student events
-# @app.route('/student')
-# def student():
+@app.route('/homepageo', methods=['GET', 'POST'])
+def homepageo():
     
+    # Query and print all the events
+    with app.app_context():
+        all_events = events.query.all()  # Query all events
+        for event in all_events:
+            print(f"Event ID: {event.event_id}, Name: {event.event_name}, Date: {event.event_date}, Time: {event.event_time}, Venue: {event.event_venue}, Description: {event.event_description}, Winner: {event.event_winner}, Organizer ID: {event.event_organizer}")
+
+    # Retrieve the flag for displaying the popup
+    success = request.args.get('success', default=False, type=bool)
+    
+    return render_template('organiser.html', events=all_events, registration_successful=success)
 
 
+# Create a route for creating events
+@app.route('/create_event', methods=['GET', 'POST'])
+def create_event():
+    form = EventForm()
+    if form.validate_on_submit():
+        event_name = form.event_name.data
+        event_date = form.event_date.data
+        event_time = form.event_time.data
+        event_venue = form.event_venue.data
+        event_description = form.event_description.data
+        event_winner = form.event_winner.data
+        
+        # Converting event_date to string format
+        event_date = event_date.strftime('%Y-%m-%d')
+        
+        # Converting event_time to string format
+        event_time = event_time.strftime('%H:%M')
+
+        # Create a new event object
+        new_event = events(event_name=event_name, event_date=event_date, event_time=event_time,
+                          event_venue=event_venue, event_description=event_description, event_winner=event_winner, event_organizer=session.get('user_id'))
+        db.session.add(new_event)
+        db.session.commit()
+
+        # Redirect to the organizer route after successful event creation
+        return redirect(url_for('homepageo'))
+
+    return render_template('create_event.html', form=form)
+
+@app.route('/organiser_events')
+def organiser_events():
+        
+    # Get the organizer ID from the session
+    organizer_id = session.get('user_id')
+    
+    # organizer id should be taken from the session
+    organizer_val = organizer.query.get(organizer_id)
+    for event in organizer_val.events:
+        print(f"Event ID: {event.event_id}, Name: {event.event_name}, Date: {event.event_date}, Time: {event.event_time}, Venue: {event.event_venue}, Description: {event.event_description}, Winner: {event.event_winner}, Organizer ID: {event.event_organizer}")
+            
+    return render_template('organiser_events.html', events=organizer_val.events)  
+ 
+@app.route('/organiser_volunteers')
+def organiser_volunteers():
+            
+    # Get the organizer ID from the session
+    organizer_id = session.get('user_id')
+    organizer_val = organizer.query.get(organizer_id)
+    for event in organizer_val.events:
+        print(f"Event ID: {event.event_id}, Name: {event.event_name}, Date: {event.event_date}, Time: {event.event_time}, Venue: {event.event_venue}, Description: {event.event_description}, Winner: {event.event_winner}, Organizer ID: {event.event_organizer}")
+        for volunteer in event.volunteers:
+            print(f"Volunteer ID: {volunteer.id}, Name: {volunteer.name}, Email: {volunteer.email}")
+    
+    return render_template('organiser_volunteers.html', events= organizer_val.events)    
+
+
+@app.route('/organiser_participants')
+def organiser_participants():
+    
+    # Get the organizer ID from the session
+    organizer_id = session.get('user_id')    
+    organizer_val = organizer.query.get(organizer_id)
+    for event in organizer_val.events:
+        print(f"Event ID: {event.event_id}, Name: {event.event_name}, Date: {event.event_date}, Time: {event.event_time}, Venue: {event.event_venue}, Description: {event.event_description}, Winner: {event.event_winner}, Organizer ID: {event.event_organizer}")
+        for participant in event.participants:
+            print(f"Participant ID: {participant.id}, Name: {participant.name}, Email: {participant.email}, Room No: {participant.room_no}, Is Allocated: {participant.is_allocated}")
+
+    return render_template('organiser_participants.html', events= organizer_val.events)
+    
+    
 @app.route('/events/<event_name>')
 def event_details(event_name):
     
