@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+    <style>
+        .success {
+            background-color: #4CAF50; /* Green */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            text-shadow: 2px 2px 4px #aaa;
+        }
+
+        #searchForm {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #searchInput {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 5px;
+            width: 60%;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #007BFF;
+        }
+
+        #searchInput::placeholder {
+            color: #aaa;
+        }
+
+        button[type="submit"] {
+            padding: 8px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Popup style */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            width: auto;
+            border-radius: 5px;
+            z-index: 9999;
+            display: none; /* Initially hide it */
+        }
+    </style>
+</head>
+<body>
+    <h1>Events</h1>
+    <form id="searchForm">
+        <input type="text" id="searchInput" placeholder="Search by event name...">
+        <button type="submit">Search</button>
+    </form>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Venue</th>
+            <th>Description</th>
+            <th>Winner</th>
+            <th>Organizer</th>
+        </tr>
+        {% for event in events %}
+        <tr class="eventRow">
+            <td><a href="/handle_student/{{ event.event_id }}">{{ event.event_name }}</a></td>
+            <td>{{ event.event_date }}</td>
+            <td>{{ event.event_time }}</td>
+            <td>{{ event.event_venue }}</td>
+            <td>{{ event.event_description }}</td>
+            <td>{{ event.event_winner }}</td>
+            <td>{{ event.event_organizer }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="button-container">
+        <button onclick="VolunteerForEvent()">Volunteer for event</button>
+        <button onclick="viewYourEvents()">View your volunteered events</button>
+    </div>
+
+    <!-- Popup message -->
+    {% if registration_successful %}
+    <div id="popup" class="popup success">Registered as Volunteer</div>
+    <script>
+        // Display the popup
+        document.getElementById('popup').style.display = 'block';
+
+        // Hide the popup after 3 seconds
+        setTimeout(function() {
+            document.getElementById('popup').style.display = 'none';
+        }, 3000);
+    </script>
+    {% endif %}
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            var rows = document.querySelectorAll('.eventRow');
+            rows.forEach(function(row) {
+                var eventName = row.cells[0].textContent.toLowerCase();
+                if (eventName.includes(searchTerm)) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        function VolunteerForEvent() {
+            // Add logic for registering for event
+            window.location.href = '/homepages/volunteer';
+        }
+
+        function viewYourEvents() {
+            // Redirect to participant events page
+            window.location.href = '/student_events';
+        }
+    </script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from forms import RegistrationForm
 from flask import Flask
 from models import db, Admin, KHR_Redddy, User
@@ -8,8 +8,9 @@ from flask import request
 
 
 app = Flask(__name__)
-app.config.from_object(Config)
+# app.config.from_object(Config)
 # db.init_app(app)
+
 
 # Define routes
 @app.route('/', methods=['GET', 'POST'])
@@ -18,14 +19,14 @@ def index():
         # Handle login form submission
         username = request.form['username']
         password = request.form['password']
+        session['user_id'] = 1
+
         
-        user = User.query.filter_by(username=username, password=password).first()
-        if user:
-            # Redirect to afterlogin page upon successful login
-            return redirect(url_for('afterlogin'))
-        else:
-            flash('Login unsuccessful. Please check your username and password.', 'danger')
-        return redirect(url_for('index'))
+        # user = User.query.filter_by(username=username, password=password).first()
+
+        # Redirect to afterlogin page upon successful login
+        return redirect(url_for('events'))
+
 
     return render_template('index.html')
 
@@ -70,6 +71,9 @@ events_data = [
 
 @app.route('/events')
 def events():
+    user_id = session.get('user_id')
+    print(user_id)
+
     events = []
     for event in events_data:
         event_dict = {

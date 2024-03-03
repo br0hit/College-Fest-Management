@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.Name }} Details</title>
+    <style>
+        /* Define CSS classes for button states */
+        .registerButton {
+            background-color: grey;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .registerButton.success {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ event.Name }} Details</h1>
+    <p><strong>Name:</strong> {{ event.Name }}</p>
+    <p><strong>Type:</strong> {{ event.Type }}</p>
+    <p><strong>Date:</strong> {{ event.Date }}</p>
+    <p><strong>Time:</strong> {{ event.Time }}</p>
+    <p><strong>Description:</strong> {{ event.Description }}</p>
+    <!-- Use a button instead of a link -->
+    <button id="registerButton" class="registerButton" onclick="register()">Register</button>
+
+    <script>
+        function register() {
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ eventName: '{{ event.Name }}' }) // Sending event name to Flask route
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Registration successful");
+                    document.getElementById('registerButton').classList.add('success'); // Add 'success' class to change color
+                    document.getElementById('registerButton').innerHTML = "Registration successful"; // Change button text
+                    return response.json();
+                } else {
+                    console.error("Registration failed");
+                }
+            })
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(error => {
+                console.error("Error during registration:", error);
+            });
+        }
+    </script>
+</body>
+</html>

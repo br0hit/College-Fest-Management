@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+</head>
+<body>
+    <h1>Events</h1>
+    <form id="searchForm">
+        <input type="text" id="searchInput" placeholder="Search by event name...">
+        <button type="submit">Search</button>
+    </form>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Time</th>
+        </tr>
+        {% for event in events %}
+        <tr class="eventRow">
+            <td><a href="/events/{{ event.Name }}">{{ event.Name }}</a></td>
+            <td>{{ event.Type }}</td>
+            <td>{{ event.Date }}</td>
+            <td>{{ event.Time }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            var rows = document.querySelectorAll('.eventRow');
+            rows.forEach(function(row) {
+                var eventName = row.cells[0].textContent.toLowerCase();
+                if (eventName.includes(searchTerm)) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
