@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event</title>
+</head>
+<body>
+    <h1>Create Event</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.event_name.label }} {{ form.event_name(size=32) }}
+        </div>
+        <div>
+            {{ form.event_date.label }} {{ form.event_date(size=32) }}
+        </div>
+        <div>
+            {{ form.event_time.label }} {{ form.event_time(size=32) }}
+        </div>
+        <div>
+            {{ form.event_venue.label }} {{ form.event_venue(size=32) }}
+        </div>
+        <div>
+            {{ form.event_description.label }} {{ form.event_description(size=32) }}
+        </div>
+        <div>
+            {{ form.event_winner.label }} {{ form.event_winner(size=32) }}
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

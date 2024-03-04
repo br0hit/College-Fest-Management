@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Participants</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Organizer Participants</h1>
+    {% for event in events %}
+        <h2>Event: {{ event.event_name }}</h2>
+        <ul>
+            {% for participant in event.participants %}
+                <li>
+                    <strong>Participant ID:</strong> {{ participant.id }}<br>
+                    <strong>Name:</strong> {{ participant.name }}<br>
+                    <strong>Email:</strong> {{ participant.email }}<br>
+                    <strong>Room No:</strong> {{ participant.room_no }}<br>
+                    <strong>Is Allocated:</strong> {{ participant.is_allocated }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>

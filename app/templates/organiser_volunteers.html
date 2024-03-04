@@ -9,7 +9,23 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-image: url('https://du-assassins.in/wp-content/uploads/2018/12/Top-10-Colege-Fests-India.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
         }
 
         h1, h2 {
@@ -33,21 +49,39 @@
         strong {
             font-weight: bold;
         }
+
+        .user-bar {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
-    <h1>Organizer Participants</h1>
-    {% for event in events %}
-        <h2>Event: {{ event.event_name }}</h2>``
-        <ul>
-            {% for volunteer in event.volunteers %}
-                <li>
-                    <strong>Volunteer ID:</strong> {{ volunteer.id }}<br>
-                    <strong>Name:</strong> {{ volunteer.name }}<br>
-                    <strong>Email:</strong> {{ volunteer.email }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% endfor %}
+    <div class="container">
+        <h1>Organizer Participants</h1>
+        {% for event in events %}
+            <h2>Event: {{ event.event_name }}</h2>
+            <ul>
+                {% for participant in event.participants %}
+                    <li>
+                        <strong>Participant ID:</strong> {{ participant.id }}<br>
+                        <strong>Name:</strong> {{ participant.name }}<br>
+                        <strong>Email:</strong> {{ participant.email }}<br>
+                        <strong>Room No:</strong> {{ participant.room_no }}<br>
+                        <strong>Is Allocated:</strong> {{ participant.is_allocated }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+
+    <div class="user-bar">
+        {% if user %}
+            You are logged in as Organiser: {{ user.name }} ({{ user.email }}) Your contact number is {{ user.contact }}
+        {% endif %}
+    </div>
 </body>
 </html>
