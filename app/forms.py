@@ -18,7 +18,8 @@ class EventForm(FlaskForm):
     event_time = TimeField('Event Time', validators=[DataRequired()])
     event_venue = StringField('Event Venue', validators=[DataRequired()])
     event_description = StringField('Event Description', validators=[DataRequired()])
-    event_winner = StringField('Event Winner', validators=[DataRequired()])
+    # Winner field can be empty
+    event_winner = StringField('Event Winner', validators=[DataRequired()], default='No winner yet')
     
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])

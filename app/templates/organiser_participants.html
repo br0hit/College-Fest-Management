@@ -83,5 +83,14 @@
             You are logged in as Organiser: {{ user.name }} ({{ user.email }}) Your contact number is {{ user.contact }}
         {% endif %}
     </div>
+
+    <button onclick="logout()">Log Out</button>
+
+    <script>
+        function logout() {
+            window.location.href = '/logout';
+        }
+    </script>
+
 </body>
 </html>

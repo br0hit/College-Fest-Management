@@ -156,6 +156,8 @@
     <div class="button-container">
         <button onclick="registerForEvent()">Register for event</button>
         <button onclick="viewYourEvents()">View your events</button>
+        <button onclick="logout()">Log Out</button>
+
     </div>
 
     <div class="user-bar">
@@ -196,6 +198,11 @@
         function registerForEvent() {
             // Add logic for registering for event
             alert('Redirecting to registration page...');
+        }
+
+        function logout() {
+            // Redirect to logout page
+            window.location.href = '/logout';
         }
 
         function viewYourEvents() {

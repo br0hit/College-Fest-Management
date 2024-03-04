@@ -155,8 +155,9 @@
     </table>
 
     <div class="button-container">
-        <button onclick="VolunteerForEvent()">Volunteer for event</button>
         <button onclick="viewYourEvents()">View your volunteered events</button>
+        <button onclick="logout()">Log Out</button>
+
     </div>
 
     <div class="user-bar">
@@ -194,9 +195,9 @@
             });
         });
 
-        function VolunteerForEvent() {
+        function logout() {
             // Add logic for registering for event
-            window.location.href = '/homepages/volunteer';
+            window.location.href = '/logout';
         }
 
         function viewYourEvents() {

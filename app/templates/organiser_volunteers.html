@@ -78,10 +78,22 @@
         {% endfor %}
     </div>
 
+    
+    <div class="button-container">
+        <button onclick="logout()">Logout</button>
+
     <div class="user-bar">
         {% if user %}
             You are logged in as Organiser: {{ user.name }} ({{ user.email }}) Your contact number is {{ user.contact }}
         {% endif %}
     </div>
+
+    <script>
+        function logout() {
+            window.location.href = '/logout';
+        }
+    </script>
+
 </body>
 </html>
+

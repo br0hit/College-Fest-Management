@@ -159,6 +159,8 @@
             <button onclick="displayParticipants()">Display participants</button>
             <button onclick="displayVolunteers()">Display volunteers</button>
             <button onclick="createNewEvent()">Create event</button>
+            <button onclick="logout()">Log Out</button>
+
         </div>
     </div>
 
@@ -209,6 +211,11 @@
         function createNewEvent() {
             // Redirect to create event page
             window.location.href = '/create_event';
+        }
+
+        function logout() {
+            // Redirect to logout page
+            window.location.href = '/logout';
         }
 
     </script>

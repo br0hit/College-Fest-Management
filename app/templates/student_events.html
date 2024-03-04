@@ -152,6 +152,9 @@
         {% endfor %}
     </table>
 
+    <div class="button-container">
+        <button onclick="logout()">Logout</button>
+
     <div class="user-bar">
         {% if user %}
             You are logged in {{ user.name }} ({{ user.email }})
@@ -172,6 +175,10 @@
                 }
             });
         });
+                function logout() {
+                    // Add logic for registering for event
+                    window.location.href = '/logout';
+                }
     </script>
 
 </body>

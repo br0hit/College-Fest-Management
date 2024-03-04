@@ -120,6 +120,10 @@
         </table>
     </div>
 
+    
+    <div class="button-container">
+        <button onclick="logout()">Logout</button>
+
     <script>
         document.getElementById('searchForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -134,6 +138,10 @@
                 }
             });
         });
+
+        function logout() {
+            window.location.href = '/logout';
+        }
     </script>
 
 </body>

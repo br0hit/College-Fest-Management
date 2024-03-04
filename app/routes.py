@@ -9,8 +9,7 @@ import hashlib
 from functools import wraps
 
 from models import db
-from models import student, volunteer, organizer, participant, events
-
+from models import Admin, student, volunteer, organizer, participant, events
 from forms import EventForm, LoginForm
 
 # Create a hash
@@ -28,14 +27,13 @@ app.config.from_object(Config)
 db.init_app(app)
 
 
-# Define a decorator to check if the user is logged in and has the correct role
 def login_required(role):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if 'user_id' not in session or session['role'] != role:
                 flash('Please log in with the correct role to access this page.', 'danger')
-                return redirect(url_for('index'))  # Redirect to the respective login page
+                return redirect(url_for('index', popup=True))  # Pass popup=True if not logged in
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -43,9 +41,44 @@ def login_required(role):
 
 
 # Define routes
+
+# Defining Admin route
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    # HTML will have a form to admin login
+    if request.method == 'POST':
+        # Handle admin login form submission
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Check if the email and the password are correct
+        
+        user = Admin.query.filter_by(email=email).first()
+        if(user.password == password):
+            # Redirect to afterlogin page upon successful login
+            
+            # Set the user_id and role in the session upon successful login
+            session['user_id'] = user.id
+            session['role'] = 'admin'
+            print(session)
+            return redirect(url_for('admin_home'))
+        else:
+            flash('Login unsuccessful. Please check your username and password.', 'danger')
+            return redirect(url_for('admin'))
+        
+    return render_template('admin.html')
+
+# Define the route for the admin homepage
+@app.route('/admin_home')
+@login_required('admin')
+def admin_home():
+    return render_template('admin_home.html')
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('homepage.html')
+    popup = request.args.get('popup', False)  # Check if popup argument is present in the request
+    return render_template('homepage.html', popup=popup)
+
 
 @app.route('/login/participant', methods=['GET', 'POST'])
 def login_participant():
@@ -76,13 +109,11 @@ def login_participant():
 
 @app.route('/login/student', methods=['GET', 'POST'])
 def login_student():
-    
-    
-    form = LoginForm()
-    if form.validate_on_submit():
         
-        email = form.email.data
-        password = form.password.data
+    if request.method == 'POST':
+        # Handle participant login form submission
+        email = request.form['email']
+        password = request.form['password']
         
         user = student.query.filter_by(email=email).first()
         print(user)
@@ -102,7 +133,7 @@ def login_student():
             flash('Login unsuccessful. Please check your username and password.', 'danger')
             return redirect(url_for('login_student'))
         
-    return render_template('student_login.html', form=form)
+    return render_template('student_login.html')
 
 @app.route('/login/organiser', methods=['GET', 'POST'])
 def login_organiser():
@@ -421,6 +452,9 @@ def homepageo():
 @app.route('/create_event', methods=['GET', 'POST'])
 @login_required('organizer')
 def create_event():
+    organiser_id = session.get('user_id')
+    organizer_val = organizer.query.get(organiser_id)
+    
     form = EventForm()
     if form.validate_on_submit():
         event_name = form.event_name.data
@@ -506,6 +540,13 @@ def notworking():
     user_id = session.get('user_type')
     print(user_id)
     return render_template('notworking.html')
+
+@app.route('/logout')
+def logout():
+    # Clear the session
+    session.clear()
+    # Redirect to the login page
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     with app.app_context():
