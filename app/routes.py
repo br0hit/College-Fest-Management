@@ -9,7 +9,7 @@ import hashlib
 from functools import wraps
 
 from models import db
-from models import Admin, student, volunteer, organizer, participant, events
+from models import Admin, student, volunteer, organizer, participant, events, room_count
 from forms import EventForm, LoginForm
 
 # Create a hash
@@ -33,7 +33,9 @@ def login_required(role):
         def decorated_function(*args, **kwargs):
             if 'user_id' not in session or session['role'] != role:
                 flash('Please log in with the correct role to access this page.', 'danger')
-                return redirect(url_for('index', popup=True))  # Pass popup=True if not logged in
+                # return redirect(url_for('index', popup=False))  # Pass popup=True if not logged in
+                return redirect(url_for('index'))  # Pass popup=True if not logged in
+
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -77,7 +79,9 @@ def admin_home():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     popup = request.args.get('popup', False)  # Check if popup argument is present in the request
-    return render_template('homepage.html', popup=popup)
+    # return render_template('homepage.html', popup=popup)
+    return render_template('homepage.html')
+
 
 
 @app.route('/login/participant', methods=['GET', 'POST'])
@@ -182,11 +186,28 @@ def create_participant():
         # generate random room number if allocate is true
         # if allocate is false, then room number should be taken from the participant form
         
-        if is_allocated:    
-            random_number = random.randint(1,15)
-            # Format and return the room number
-            room_number = f"ROOM#{random_number}"
-            user = participant(name=name, email=email, password=hashed_password, is_allocated=is_allocated, room_no=room_number)
+        if is_allocated:  
+            
+            # getting the first row from the room_count table
+            room_count_val = room_count.query.first()
+    
+            # check if room_count_val has a value greater than 0
+            if room_count_val.room_no > 0:
+                # allot the room number to the participant
+                random_number = room_count_val.room_no                              
+                # Format and return the room number
+                room_number = f"ROOM#{random_number}"
+                # decrement the room number by 1
+                room_count_val.room_no = room_count_val.room_no - 1
+                # Update the database
+                db.session.commit()
+                
+                user = participant(name=name, email=email, password=hashed_password, is_allocated=is_allocated, room_no=room_number)
+            else:
+                
+                # Display a message to the user that no rooms are available
+                flash('No rooms are available.','danger')
+                user = participant(name=name, email=email, password=hashed_password, is_allocated=0, room_no="No room available")
         else:
             user = participant(name=name, email=email, password=hashed_password, is_allocated=is_allocated, room_no= "Not Allocated")
             

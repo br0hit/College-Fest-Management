@@ -40,3 +40,6 @@ INSERT INTO events (event_name, event_date, event_time, event_venue, event_descr
 -- Example:
 -- INSERT INTO volunteer_events (volunteer_id, event_id) VALUES (1, 1), (2, 2), (3, 3);
 -- INSERT INTO participants_events (participant_id, event_id) VALUES (1, 1), (2, 2), (3, 3);
+
+-- Insert into room_count table which has a single value
+INSERT INTO room_count (room_no) VALUES (5);

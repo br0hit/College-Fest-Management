@@ -80,5 +80,16 @@
         <label for="is_allocated">Allocate Room</label><br>
         <input type="submit" value="Submit">
     </form>
+
+        <!-- JavaScript code to display pop-up message -->
+        <script>
+            // Check if flash message exists
+            var flashMessage = document.querySelector('.flash').innerText;
+            if (flashMessage !== '') {
+                // Display pop-up message
+                alert(flashMessage);
+            }
+        </script>
+        
 </body>
 </html>

@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
 
 class Admin(db.Model):
@@ -79,3 +80,73 @@ class events(db.Model):
     event_organizer = db.Column(db.Integer, db.ForeignKey('organizer.id'), nullable=False)
     # No need to add anything here for the (participants) many-to-many, it's defined in the participant model
     # No need to add anything here for the (volunteer) many-to-many, it's defined in the volunteer model
+    
+    
+    # adding a room count table to update the room count
+class room_count(db.Model):
+    __tablename__ = 'room_count'
+    room_no = db.Column(db.Integer, primary_key=True)
+    
+    
+def create_triggers():
+    # Function and trigger for cascading delete of events
+    event_cascade_function_sql = """
+    CREATE OR REPLACE FUNCTION delete_event_cascade()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        DELETE FROM participants_events WHERE event_id = OLD.event_id;
+        DELETE FROM volunteer_events WHERE event_id = OLD.event_id;
+        RETURN OLD;
+    END;
+    $$ LANGUAGE plpgsql;
+    """
+
+    event_cascade_trigger_sql = """
+    CREATE TRIGGER event_delete_trigger
+    BEFORE DELETE ON events
+    FOR EACH ROW EXECUTE FUNCTION delete_event_cascade();
+    """
+
+    # Function and trigger for cascading delete of participants
+    participant_cascade_function_sql = """
+    CREATE OR REPLACE FUNCTION delete_participant_cascade()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        DELETE FROM participants_events WHERE participant_id = OLD.id;
+        RETURN OLD;
+    END;
+    $$ LANGUAGE plpgsql;
+    """
+
+    participant_cascade_trigger_sql = """
+    CREATE TRIGGER participant_delete_trigger
+    BEFORE DELETE ON participant
+    FOR EACH ROW EXECUTE FUNCTION delete_participant_cascade();
+    """
+
+    # Function and trigger for cascading delete of volunteers
+    volunteer_cascade_function_sql = """
+    CREATE OR REPLACE FUNCTION delete_volunteer_cascade()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        DELETE FROM volunteer_events WHERE volunteer_id = OLD.id;
+        RETURN OLD;
+    END;
+    $$ LANGUAGE plpgsql;
+    """
+
+    volunteer_cascade_trigger_sql = """
+    CREATE TRIGGER volunteer_delete_trigger
+    BEFORE DELETE ON volunteer
+    FOR EACH ROW EXECUTE FUNCTION delete_volunteer_cascade();
+    """
+
+    # Execute SQL
+    db.session.execute((event_cascade_function_sql))
+    db.session.execute((event_cascade_trigger_sql))
+    db.session.execute((participant_cascade_function_sql))
+    db.session.execute((participant_cascade_trigger_sql))
+    db.session.execute((volunteer_cascade_function_sql))
+    db.session.execute((volunteer_cascade_trigger_sql))
+
+    db.session.commit()

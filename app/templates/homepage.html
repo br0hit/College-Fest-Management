@@ -79,17 +79,15 @@
     <div class="popup" id="popup">
         Use correct login
     </div>
-    
+
     <script>
-        // JavaScript to show popup for 3 seconds and then hide it
-        document.addEventListener('DOMContentLoaded', function () {
-            // Show the popup
-            document.getElementById('popup').style.display = 'block';
-            // Hide the popup after 3 seconds
-            setTimeout(function () {
-                document.getElementById('popup').style.display = 'none';
-            }, 3000);
-        });
+        // Check if flash message exists
+        var flashMessage = document.querySelector('.flash').innerText;
+        if (flashMessage !== '') {
+            // Display pop-up message
+            alert(flashMessage);
+        }
     </script>
+    
 </body>
 </html>
