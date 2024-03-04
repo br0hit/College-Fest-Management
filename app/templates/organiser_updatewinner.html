@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Winners</title>
+</head>
+<body>
+    <h1>Update Winners</h1>
+    <form method="POST" action="/organiser_updatewinner">
+        {% for event in events %}
+            <div>
+                <label for="winner_{{ event.event_name }}">Event Name: {{ event.event_name }}</label>
+                {% if event.event_winner == "No winner" %}
+                    <input type="text" id="winner_{{ event.event_name }}" name="winner_{{ event.event_name }}" placeholder="Enter winner's name">
+                {% else %}
+                    <input type="text" id="winner_{{ event.event_name }}" name="winner_{{ event.event_name }}" placeholder="{{ event.event_winner }}">
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

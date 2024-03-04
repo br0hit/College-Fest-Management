@@ -531,7 +531,37 @@ def organiser_participants():
             print(f"Participant ID: {participant.id}, Name: {participant.name}, Email: {participant.email}, Room No: {participant.room_no}, Is Allocated: {participant.is_allocated}")
 
     return render_template('organiser_participants.html', events= organizer_val.events, user= organizer_val)
+
+@app.route('/organiser_updatewinner', methods=['GET', 'POST'])
+@login_required('organizer')
+def organiser_updatewinner():
     
+    # Get all the events by query
+    
+    all_events = events.query.all()
+    
+    if request.method == 'POST':
+        winners = {}
+        for event in all_events:
+            winner_name = request.form.get('winner_' + event.event_name)
+            if winner_name:
+                winners[event.event_name] = winner_name
+                # Update the event winner in the database
+                event = events.query.get(event.event_id)
+                # new winner from the form
+                event.event_winner = winner_name
+                try:
+                    db.session.commit()
+                    print("Event winner updated successfully.")
+                except Exception as e:
+                    # Rollback in case of error
+                    db.session.rollback()
+        # Now winners dictionary contains event names as keys and corresponding winner names as values
+        print(winners)  # You can process this data as per your requirement
+        return redirect(url_for('homepageo'))
+
+    return render_template('organiser_updatewinner.html', events=all_events) 
+  
 
 @app.route('/notworking', methods=['GET', 'POST'])
 @login_required('notadmin')

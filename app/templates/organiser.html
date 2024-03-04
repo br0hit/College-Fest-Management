@@ -159,6 +159,7 @@
             <button onclick="displayParticipants()">Display participants</button>
             <button onclick="displayVolunteers()">Display volunteers</button>
             <button onclick="createNewEvent()">Create event</button>
+            <button onclick="updateWinner()">Update Winner</button>
             <button onclick="logout()">Log Out</button>
 
         </div>
@@ -211,6 +212,11 @@
         function createNewEvent() {
             // Redirect to create event page
             window.location.href = '/create_event';
+        }
+
+        function updateWinner() {
+            // Redirect to create event page
+            window.location.href = '/organiser_updatewinner';
         }
 
         function logout() {
